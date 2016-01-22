@@ -1,9 +1,18 @@
-(use-modules (web client)
-             (web response)
-             (json)
-             (rnrs bytevectors)
-             (ice-9 format)
-             (ice-9 pretty-print))
+(define-module (words)
+  #:use-module (web client)
+  #:use-module (web response)
+  #:use-module (json)
+  #:use-module (rnrs bytevectors)
+  #:use-module (ice-9 format)
+  #:use-module (ice-9 pretty-print)
+  #:export (meaning
+            synonym
+            antonym
+            usage-examples
+            hyphenation
+            part-of-speech
+            pronunciation
+            translate))
 
 (define base-urls
   '((#:glosbe . "https://glosbe.com/gapi/translate?from=~a&dest=~a&format=json&pretty=true&phrase=~a")
@@ -43,18 +52,10 @@
   (lookup #:bighugelabs word))
 
 (display (glosbe "somewhere"))
-(newline)
-(newline)
-
 (display (wordnik "somewhere"))
-(newline)
-(newline)
 (display (urbandict "somewhere"))
-(newline)
-(newline)
 (display (bighugelabs "somewhere"))
-(newline)
-(newline)
+
 
 (display
  (scm->json-string (json (array 1 2 3))))
@@ -68,9 +69,26 @@
   :param dest-lang: Defaults to :"" For eg: "" for french
   :returns: returns a json object as str, False if invalid phrase
   "
-  (let* ((base-url (assv-ref base-urls #:urbandict))
-         (url (format #f base-url phrase )))
-    (utf8->string (read-response-body (http-get url #:streaming? #t)))))
+  (glosbe phrase source-lang dest-lang))
+
+(define* (synonym phrase #:optional (source-lang #:en) (dest-lang #:en))
+  "
+   make calls to the glosbe API
+
+  :param phrase: word for which synonyms are to be found
+  :param source-lang: Defaults to : ""
+  :param dest-lang: Defaults to :"" For eg: "" for french
+  :returns: returns a json object as str, False if invalid phrase
+  "
+  (glosbe phrase source-lang dest-lang))
+
+(define antonym 1)
+(define usage-examples 2)
+(define hyphenation 3)
+(define part-of-speech 4)
+(define pronunciation 5)
+(define translate 6)
+
 
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
