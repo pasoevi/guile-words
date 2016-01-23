@@ -12,7 +12,8 @@
             hyphenation
             part-of-speech
             pronunciation
-            translate))
+            translate
+            bighugelabs))
 
 (define base-urls
   '((#:glosbe . "https://glosbe.com/gapi/translate?from=~a&dest=~a&format=json&pretty=true&phrase=~a")
@@ -51,14 +52,18 @@
 (define (bighugelabs word)
   (lookup #:bighugelabs word))
 
-(display (glosbe "somewhere"))
+#| (display (glosbe "somewhere")) |#
+#| (display (bighugelabs "somewhere"))
+|#
+#|
 (display (wordnik "somewhere"))
 (display (urbandict "somewhere"))
-(display (bighugelabs "somewhere"))
-
 
 (display
  (scm->json-string (json (array 1 2 3))))
+
+|#
+
 
 (define* (meaning phrase #:optional (source-lang #:en) (dest-lang #:en))
   "
@@ -82,7 +87,13 @@
   "
   (glosbe phrase source-lang dest-lang))
 
-(define antonym 1)
+(define (antonym word)
+  (let ((result (json-string->scm (bighugelabs word))))
+   (hash-for-each (lambda (key value) (hash-for-each (lambda (k v) (display v) (newline)) value))
+                  result)))
+
+(antonym "good")
+
 (define usage-examples 2)
 (define hyphenation 3)
 (define part-of-speech 4)
@@ -92,3 +103,5 @@
 
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
+
+(display (bighugelabs "good"))
