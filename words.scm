@@ -1,3 +1,23 @@
+;;;; (guile-words) -- a vocabulary library to find the meaning, synonyms,
+;;;; antonyms and more for a given word.
+;;;;
+;;;; Copyright (C) 2016 Sergi Pasoev
+;;;;
+;;;; This library is free software; you can redistribute it and/or
+;;;; modify it under the terms of the GNU Lesser General Public
+;;;; License as published by the Free Software Foundation; either
+;;;; version 3 of the License, or (at your option) any later version.
+;;;;
+;;;; This library is distributed in the hope that it will be useful,
+;;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;;;; Lesser General Public License for more details.
+;;;;
+;;;; You should have received a copy of the GNU Lesser General Public
+;;;; License along with this library; if not, write to the Free Software
+;;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
+
 (define-module (words)
   #:use-module (web client)
   #:use-module (web response)
@@ -27,12 +47,12 @@
 (define (call-service url)
   (utf8->string (read-response-body (http-get url #:streaming? #t))))
 
-(define* (lookup provider word #:optional (source-lang #:en) (dest-lang #:en))
+(define* (lookup provider word #:optional (source-lang #:en) (dest-lang #:en) (action "hyphenation"))
   (let* ((base-url (assv-ref base-urls provider))
          (from (assv-ref langs source-lang))
          (to (assv-ref langs dest-lang))
          (url (cond
-               ((eq? provider #:wordnik) (format #f base-url word "definitions"))
+               ((eq? provider #:wordnik) (format #f base-url word action))
                ((eq? provider #:glosbe) (format #f base-url from to word))
                ((eq? provider #:urbandict) (format #f base-url "define" word))
                ((eq? provider #:bighugelabs) (format #f base-url word)))))
@@ -74,6 +94,18 @@
   "
   (glosbe phrase source-lang dest-lang))
 
+(define (synonym word)
+  (let ((result (json-string->scm (bighugelabs word))))
+    (hash-for-each
+     (lambda (key value)
+       (hash-for-each
+        (lambda (k v)
+          (when (string=? k "syn")
+            (display v)
+            (newline)))
+        value))
+     result)))
+
 (define (antonym word)
   (let ((result (json-string->scm (bighugelabs word))))
     (hash-for-each
@@ -86,7 +118,12 @@
         value))
      result)))
 
+(define (hyphenation word)
+  (json-string->scm (wordnik word)))
+
 (antonym "good")
+(synonym "good")
+(hyphenation "nature")
 
 (define usage-examples 2)
 (define hyphenation 3)
@@ -97,5 +134,3 @@
 
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
-
-;; (display (bighugelabs "good"))
