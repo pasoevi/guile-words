@@ -28,11 +28,10 @@
   #:export (meaning
             synonym
             antonym
-            usage-examples
+ ;           usage-examples
             hyphenation
-            part-of-speech
+;            part-of-speech
             pronunciation
-            translate
             bighugelabs))
 
 (define base-urls
@@ -47,7 +46,7 @@
 (define (call-service url)
   (utf8->string (read-response-body (http-get url #:streaming? #t))))
 
-(define* (lookup provider word #:optional (source-lang #:en) (dest-lang #:en) (action "hyphenation"))
+(define* (lookup provider word #:optional (source-lang #:en) (dest-lang #:en) (action "error"))
   (let* ((base-url (assv-ref base-urls provider))
          (from (assv-ref langs source-lang))
          (to (assv-ref langs dest-lang))
@@ -63,8 +62,8 @@
 (define* (glosbe word #:optional (source-lang #:en) (dest-lang #:en))
   (lookup #:glosbe word source-lang dest-lang))
 
-(define* (wordnik word #:optional (source-lang #:en) (dest-lang #:en))
-  (lookup #:wordnik word source-lang dest-lang))
+(define* (wordnik word action #:optional (source-lang #:en) (dest-lang #:en))
+  (lookup #:wordnik word source-lang dest-lang action))
 
 (define (urbandict word)
   (lookup #:urbandict word))
@@ -94,43 +93,34 @@
   "
   (glosbe phrase source-lang dest-lang))
 
-(define (synonym word)
-  (let ((result (json-string->scm (bighugelabs word))))
+(define (parse-bighuge word action)
+  (let ((result (json-string->scm (bighugelabs word)))
+        (lst (list action)))
     (hash-for-each
      (lambda (key value)
        (hash-for-each
         (lambda (k v)
-          (when (string=? k "syn")
-            (display v)
-            (newline)))
+          (when (string=? k action)
+            (append! lst v)))
         value))
-     result)))
+     result)
+    lst))
+
+(define (synonym word)
+  (parse-bighuge word "syn"))
 
 (define (antonym word)
-  (let ((result (json-string->scm (bighugelabs word))))
-    (hash-for-each
-     (lambda (key value)
-       (hash-for-each
-        (lambda (k v)
-          (when (string=? k "ant")
-            (display v)
-            (newline)))
-        value))
-     result)))
+  (parse-bighuge word "ant"))
 
 (define (hyphenation word)
-  (json-string->scm (wordnik word)))
+  (wordnik word "hyphenation"))
 
-(antonym "good")
-(synonym "good")
-(hyphenation "nature")
+;; TODO: fix the unicode problem
+(define (pronunciation word)
+  (wordnik word "pronunciations"))
 
 (define usage-examples 2)
-(define hyphenation 3)
 (define part-of-speech 4)
-(define pronunciation 5)
-(define translate 6)
-
 
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
