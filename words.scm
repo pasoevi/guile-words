@@ -52,19 +52,6 @@
 (define (bighugelabs word)
   (lookup #:bighugelabs word))
 
-#| (display (glosbe "somewhere")) |#
-#| (display (bighugelabs "somewhere"))
-|#
-#|
-(display (wordnik "somewhere"))
-(display (urbandict "somewhere"))
-
-(display
- (scm->json-string (json (array 1 2 3))))
-
-|#
-
-
 (define* (meaning phrase #:optional (source-lang #:en) (dest-lang #:en))
   "
    make calls to the glosbe API
@@ -89,8 +76,15 @@
 
 (define (antonym word)
   (let ((result (json-string->scm (bighugelabs word))))
-   (hash-for-each (lambda (key value) (hash-for-each (lambda (k v) (display v) (newline)) value))
-                  result)))
+    (hash-for-each
+     (lambda (key value)
+       (hash-for-each
+        (lambda (k v)
+          (when (string=? k "ant")
+            (display v)
+            (newline)))
+        value))
+     result)))
 
 (antonym "good")
 
@@ -104,4 +98,4 @@
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
 
-(display (bighugelabs "good"))
+;; (display (bighugelabs "good"))
