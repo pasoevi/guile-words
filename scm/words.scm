@@ -1,21 +1,22 @@
-;;;; (guile-words) -- a vocabulary library to find the meaning, synonyms,
-;;;; antonyms and more for a given word.
-;;;;
-;;;; Copyright (C) 2016 Sergi Pasoev
-;;;;
-;;;; This library is free software; you can redistribute it and/or
-;;;; modify it under the terms of the GNU Lesser General Public
-;;;; License as published by the Free Software Foundation; either
-;;;; version 3 of the License, or (at your option) any later version.
-;;;;
-;;;; This library is distributed in the hope that it will be useful,
-;;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;;;; Lesser General Public License for more details.
-;;;;
-;;;; You should have received a copy of the GNU Lesser General Public
-;;;; License along with this library; if not, write to the Free Software
-;;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+;;; (guile-words) -- a vocabulary library to find the meaning, synonyms,
+;;; antonyms and more for a given word.
+;;;
+;;; Copyright (C) 2016 Sergi Pasoev
+;;;
+;;; This library is free software; you can redistribute it and/or
+;;; modify it under the terms of the GNU Lesser General Public
+;;; License as published by the Free Software Foundation; either
+;;; version 3 of the License, or (at your option) any later version.
+;;;
+;;; This library is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;;; Lesser General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU Lesser General Public
+;;; License along with this library; if not, write to the Free
+;;; Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;;; Boston, MA 02110-1301 USA
 
 
 (define-module (words)
@@ -28,9 +29,9 @@
   #:export (meaning
             synonym
             antonym
- ;           usage-examples
+                                        ;           usage-examples
             hyphenation
-;            part-of-speech
+                                        ;            part-of-speech
             pronunciation
             bighugelabs))
 
@@ -43,6 +44,15 @@
 (define langs
   '((#:en . "en")))
 
+(define actions
+  '((#:synonym . "syn")
+    (#:antonym . "ant")
+    (#:related . "rel")
+    (#:similar . "sim")
+    (#:hyphenation . "hyphenation")
+    (#:pronunciation . "pronunciations")
+    (#:define . "define")))
+
 (define (call-service url)
   (utf8->string (read-response-body (http-get url #:streaming? #t))))
 
@@ -53,7 +63,7 @@
          (url (cond
                ((eq? provider #:wordnik) (format #f base-url word action))
                ((eq? provider #:glosbe) (format #f base-url from to word))
-               ((eq? provider #:urbandict) (format #f base-url "define" word))
+               ((eq? provider #:urbandict) (format #f base-url #:define word))
                ((eq? provider #:bighugelabs) (format #f base-url word)))))
     (call-service url)))
 
@@ -80,17 +90,6 @@
   "
   (glosbe phrase source-lang dest-lang))
 
-(define* (synonym phrase #:optional (source-lang #:en) (dest-lang #:en))
-  "
-   make calls to the glosbe API
-
-  :param phrase: word for which synonyms are to be found
-  :param source-lang: Defaults to : ""
-  :param dest-lang: Defaults to :"" For eg: "" for french
-  :returns: returns a json object as str, False if invalid phrase
-  "
-  (glosbe phrase source-lang dest-lang))
-
 (define (parse-bighuge word action)
   (let ((result (json-string->scm (bighugelabs word)))
         (lst (list action)))
@@ -105,17 +104,23 @@
     lst))
 
 (define (synonym word)
-  (parse-bighuge word "syn"))
+  (parse-bighuge word #:syn))
+
+(define (related word)
+  (parse-bighuge word #:rel))
+
+(define (similar word)
+  (parse-bighuge word #:sim))
 
 (define (antonym word)
-  (parse-bighuge word "ant"))
+  (parse-bighuge word #:ant))
 
 (define (hyphenation word)
-  (wordnik word "hyphenation"))
+  (wordnik word #:hyphenation))
 
 ;; TODO: fix the unicode problem
 (define (pronunciation word)
-  (wordnik word "pronunciations"))
+  (wordnik word #:pronunciation))
 
 (define usage-examples 2)
 (define part-of-speech 4)
