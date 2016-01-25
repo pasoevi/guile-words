@@ -29,11 +29,8 @@
   #:export (meaning
             synonym
             antonym
-                                        ;           usage-examples
             hyphenation
-                                        ;            part-of-speech
-            pronunciation
-            bighugelabs))
+            pronunciation))
 
 (define base-urls
   '((#:glosbe . "https://glosbe.com/gapi/translate?from=~a&dest=~a&format=json&pretty=true&phrase=~a")
