@@ -38,7 +38,7 @@
 # Backup files
 *~
 
-configure
+# configure
 Makefile
 aclocal.m4
 *.cache
