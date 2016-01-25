@@ -1,3 +1,22 @@
+/*
+
+  Copyright (C) 2016 Sergi Pasoev.
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -5,7 +24,7 @@
 #include <libguile.h>
 
 char *program_name = "dict";
-char *version = "0.01";
+char *version = "0.01b";
 char *hist_fname = "/home/sergi/.weehist";
 
 /* Declare SCM types for calling a function and reading its output */
@@ -20,6 +39,19 @@ antonym synonym hyphenation prununciation\n", program_name);
 
 void print_version(void){
   printf("%s\n", version);
+}
+
+void print_scheme_list(SCM lst){
+  /* Calculate the size of the list returned from Scheme */
+  int i, length;
+  length = scm_to_int(scm_length (lst));
+  /* Start from 1 as the zero-th element only denotes query type */
+  for(i = 1; i < length; i++){
+    SCM elm = scm_list_ref(lst, scm_from_int(i));
+    char *anton = scm_to_locale_string (elm);
+    printf("%s ", anton);
+  }
+  printf("\n");
 }
 
 int append_line(char *word, char *history_file){
@@ -42,6 +74,25 @@ int add_to_history(char *word, char *history_file){
   return errnum;
 }
 
+void print_history(char *history_file){
+  FILE * fp;
+  char * line = NULL;
+  size_t len = 0;
+  ssize_t read;
+
+  fp = fopen(history_file, "r");
+  if (fp == NULL)
+    exit(EXIT_FAILURE);
+
+  while ((read = getline(&line, &len, fp)) != -1) {
+    printf("%s", line);
+  }
+
+  fclose(fp);
+  if (line)
+    free(line);
+}
+
 void process_phrase(char *action,  char *word, bool add_to_hist){
   /* Add to history */
   if(add_to_hist){
@@ -49,24 +100,16 @@ void process_phrase(char *action,  char *word, bool add_to_hist){
     errnum = add_to_history(word, hist_fname);
   }
 
-  /* Look the word up */
+  /* Look up and call the function */
   func_symbol = scm_c_lookup(action);
   func = scm_variable_ref(func_symbol);
   ret_val = scm_call_1(func, scm_from_locale_string(word));
 
+  /* TODO: process output based on the result of the Scheme function */
   /* SCM is_list = scm_list_p (ret_val); */
 
-  int length;
-  length = scm_to_int(scm_length (ret_val));
-
-  /* Start from 1 as the zero-th element only denotes query type */
-  int i;
-  for(i = 1; i < length; i++){
-    SCM elm = scm_list_ref(ret_val, scm_from_int(i));
-    char *anton = scm_to_locale_string (elm);
-    printf("%s ", anton);
-  }
-  printf("\n");
+  /* Print the output */
+  print_scheme_list(ret_val);
 }
 
 /* Initialise Guile and load the Scheme file containing procedures */
@@ -76,11 +119,10 @@ void init(void){
 }
 
 int main(int argc, char *argv[]){
-  int add_to_hist_flg = 0;
-  int show_version_flg = 0;
-  char *cvalue = NULL;
-
-  char *action;
+  bool add_to_hist_flg = false;
+  bool show_version_flg = false;
+  bool print_hist_flg = false;
+  char *action = NULL;
 
   int index;
   int c;
@@ -88,16 +130,16 @@ int main(int argc, char *argv[]){
   opterr = 0;
   /* Get the action and the word from command line */
 
-  while((c = getopt(argc, argv, "vhc:")) != -1){
+  while((c = getopt(argc, argv, "vhr")) != -1){
     switch(c){
     case 'h':
-      add_to_hist_flg = 1;
+      add_to_hist_flg = true;
       break;
     case 'v':
-      show_version_flg = 1;
+      show_version_flg = true;
       break;
-    case 'c':
-      cvalue = optarg;
+    case 'r':
+      print_hist_flg = true;
       break;
     case '?':
       if(optopt == 'c'){
@@ -113,7 +155,9 @@ int main(int argc, char *argv[]){
                 "Unknown option character `\\x%x'.\n",
                 optopt);
       }
+
       return 1;
+
     default:
       print_usage();
       abort();
@@ -125,8 +169,16 @@ int main(int argc, char *argv[]){
     return EXIT_SUCCESS;
   }
 
+  if(print_hist_flg){
+    print_history(hist_fname);
+  }
+
   init();
 
+  /*
+    Process the positional arguments: the first argument being the
+    action and the remaining ones the words to look up.
+  */
   int i = 0;
   for (index = optind; index < argc; index++){
     if(i == 0){
@@ -135,6 +187,7 @@ int main(int argc, char *argv[]){
     }else{
       process_phrase(action, argv[index], add_to_hist_flg);
     }
+    
     i++;
   }
 
