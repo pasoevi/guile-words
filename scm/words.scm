@@ -34,7 +34,7 @@
 
 (define base-urls
   '((#:glosbe . "https://glosbe.com/gapi/translate?from=~a&dest=~a&format=json&pretty=true&phrase=~a")
-    (#:wordnik . "http://api.wordnik.com/v4/word.json/~a/~a?api_key=1e940957819058fe3ec7c59d43c09504b400110db7faa0509")
+    (#:wordnik . "http://api.wordnik.com/v4/word.json/~a/~a?api_key=9a93b2e159528c8d7d1050840b7065a6a64569e8e4b8e6e73")
     (#:urbandict . "http://api.urbandictionary.com/v0/~a?term=~a")
     (#:bighugelabs . "http://words.bighugelabs.com/api/2/eb4e57bb2c34032da68dfeb3a0578b68/~a/json")))
 
