@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <libguile.h>
@@ -114,7 +115,7 @@ void process_phrase(char *action,  char *word, bool add_to_hist){
 /* Initialise Guile and load the Scheme file containing procedures */
 void init(void){
   scm_init_guile();
-  scm_c_primitive_load ("../words.scm");
+  scm_c_primitive_load ("../scm/words.scm");
 }
 
 int main(int argc, char *argv[]){

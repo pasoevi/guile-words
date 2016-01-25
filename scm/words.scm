@@ -60,8 +60,9 @@
   (let* ((base-url (assv-ref base-urls provider))
          (from (assv-ref langs source-lang))
          (to (assv-ref langs dest-lang))
+	 (actn (assv-ref actions action))
          (url (cond
-               ((eq? provider #:wordnik) (format #f base-url word action))
+               ((eq? provider #:wordnik) (format #f base-url word actn))
                ((eq? provider #:glosbe) (format #f base-url from to word))
                ((eq? provider #:urbandict) (format #f base-url #:define word))
                ((eq? provider #:bighugelabs) (format #f base-url word)))))
@@ -92,28 +93,29 @@
 
 (define (parse-bighuge word action)
   (let ((result (json-string->scm (bighugelabs word)))
-        (lst (list action)))
+        (lst (list action))
+	(act (assv-ref actions action)))
     (hash-for-each
      (lambda (key value)
        (hash-for-each
         (lambda (k v)
-          (when (string=? k action)
+          (when (string=? k act)
             (append! lst v)))
         value))
      result)
     lst))
 
 (define (synonym word)
-  (parse-bighuge word #:syn))
+  (parse-bighuge word #:synonym))
 
 (define (related word)
-  (parse-bighuge word #:rel))
+  (parse-bighuge word #:related))
 
 (define (similar word)
-  (parse-bighuge word #:sim))
+  (parse-bighuge word #:similar))
 
 (define (antonym word)
-  (parse-bighuge word #:ant))
+  (parse-bighuge word #:antonym))
 
 (define (hyphenation word)
   (wordnik word #:hyphenation))
