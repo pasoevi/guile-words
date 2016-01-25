@@ -57,8 +57,6 @@
                ((eq? provider #:bighugelabs) (format #f base-url word)))))
     (call-service url)))
 
-
-
 (define* (glosbe word #:optional (source-lang #:en) (dest-lang #:en))
   (lookup #:glosbe word source-lang dest-lang))
 

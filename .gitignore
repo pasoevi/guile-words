@@ -37,3 +37,12 @@
 
 # Backup files
 *~
+
+configure
+Makefile
+aclocal.m4
+*.cache
+config.log
+config.status
+app
+

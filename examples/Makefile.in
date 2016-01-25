@@ -1,0 +1,12 @@
+# The configure script fills in these values
+CC=@CC@
+CFLAGS=@GUILE_CFLAGS@
+LIBS=@GUILE_LIBS@
+
+app: app.o
+	${CC} app.o ${LIBS} -o app
+app.o: app.c
+	${CC} -c ${CFLAGS} app.c
+
+clean:
+	rm *.o app
