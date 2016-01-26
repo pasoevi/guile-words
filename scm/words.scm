@@ -18,6 +18,7 @@
 ;;; Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;;; Boston, MA 02110-1301 USA
 
+(define version "0.01")
 
 (define-module (words)
   #:use-module (web client)
@@ -26,9 +27,12 @@
   #:use-module (rnrs bytevectors)
   #:use-module (ice-9 format)
   #:use-module (ice-9 pretty-print)
+  #:use-module (gnutls)
   #:export (meaning
             synonym
             antonym
+            similar
+            related
             hyphenation
             pronunciation))
 
@@ -36,28 +40,32 @@
   '((#:glosbe . "https://glosbe.com/gapi/translate?from=~a&dest=~a&format=json&pretty=true&phrase=~a")
     (#:wordnik . "http://api.wordnik.com/v4/word.json/~a/~a?api_key=9a93b2e159528c8d7d1050840b7065a6a64569e8e4b8e6e73")
     (#:urbandict . "http://api.urbandictionary.com/v0/~a?term=~a")
-    (#:bighugelabs . "http://words.bighugelabs.com/api/2/eb4e57bb2c34032da68dfeb3a0578b68/~a/json")))
+    (#:bighugelabs . "http://words.bighugelabs.com/api/2/6a7727e0e5cb684b8de04f34faa83665/~a/json")))
 
 (define langs
   '((#:en . "en")))
 
 (define actions
-  '((#:synonym . "syn")
+  '((#:meaning . "define")
+    (#:synonym . "syn")
     (#:antonym . "ant")
     (#:related . "rel")
     (#:similar . "sim")
+    (#:usage-examples . "usage-examples")
     (#:hyphenation . "hyphenation")
     (#:pronunciation . "pronunciations")
-    (#:define . "define")))
+    (#:define . "definitions")))
 
 (define (call-service url)
-  (utf8->string (read-response-body (http-get url #:streaming? #t))))
+  (utf8->string
+   (read-response-body
+    (http-get url #:streaming? #t))))
 
 (define* (lookup provider word #:optional (source-lang #:en) (dest-lang #:en) (action "error"))
   (let* ((base-url (assv-ref base-urls provider))
          (from (assv-ref langs source-lang))
          (to (assv-ref langs dest-lang))
-	 (actn (assv-ref actions action))
+         (actn (assv-ref actions action))
          (url (cond
                ((eq? provider #:wordnik) (format #f base-url word actn))
                ((eq? provider #:glosbe) (format #f base-url from to word))
@@ -86,12 +94,12 @@
   :param dest-lang: Defaults to :"" For eg: "" for french
   :returns: returns a json object as str, False if invalid phrase
   "
-  (glosbe phrase source-lang dest-lang))
+  (wordnik phrase #:define))
 
 (define (parse-bighuge word action)
   (let ((result (json-string->scm (bighugelabs word)))
         (lst (list action))
-	(act (assv-ref actions action)))
+        (act (assv-ref actions action)))
     (hash-for-each
      (lambda (key value)
        (hash-for-each
@@ -126,3 +134,6 @@
 
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
+
+(display (meaning "something"))
+
