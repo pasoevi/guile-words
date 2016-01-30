@@ -129,11 +129,8 @@
 (define (pronunciation word)
   (wordnik word #:pronunciation))
 
-(define usage-examples 2)
-(define part-of-speech 4)
+(define usage-examples "Not implemented")
+(define part-of-speech "Not implemented")
 
 (define* (process action phrase #:optional (source-lang #:en) (dest-lang #:en))
   (action phrase source-lang dest-lang))
-
-(display (meaning "something"))
-
