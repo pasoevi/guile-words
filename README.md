@@ -17,11 +17,6 @@ The program makes use of several online dictionaries:
 - BighugeLabs
 - Urbandict
 
-## *Documentation*
-
-* auto-gen TOC
-{:toc}
-
 ## Requirements
 
 Aside from a correct Guile installation, the library also requires
