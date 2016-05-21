@@ -1,3 +1,5 @@
+# guile-words
+
 *guile-words* is a [Guile](http://www.gnu.org/software/guile/) port of the
 [Vocabulary](https://github.com/prodicus/vocabulary) Python library
 that displays meanings, synonyms, antonyms and more for a given word.
@@ -146,8 +148,3 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
-
-
-
-
-<a href="https://github.com/pasoev/guile-words"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
