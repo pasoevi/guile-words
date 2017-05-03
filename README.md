@@ -104,14 +104,13 @@ and pass the newly defined action to it:
 
 ### The C client program
 
-{% highlight bash %}
-
+```
 app synonym good
 => full estimable honorable respectable beneficial just upright
 ... expert practiced proficient skillful skilful dear near
 depend quality vantage well thoroughly soundly
 
-{% endhighlight %}
+```
 
 ## Contributing
 
