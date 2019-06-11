@@ -1,7 +1,7 @@
 ;;; (guile-words) -- a vocabulary library to find the meaning, synonyms,
 ;;; antonyms and more for a given word.
 ;;;
-;;; Copyright (C) 2016 Sergi Pasoev
+;;; Copyright (C) 2016 Sergo Pasoevi
 ;;;
 ;;; This library is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
