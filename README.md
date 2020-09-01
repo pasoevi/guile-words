@@ -24,10 +24,10 @@ Aside from a correct Guile installation, the library also requires
 
 ## Installation
 
-Download the [tar file](https://github.com/pasoev/guile-words/releases/download/0.01/guile-words-0.01.tar.gz) or clone a git reository
+Download the [tar file](https://github.com/pasoevi/guile-words/releases/download/0.01/guile-words-0.01.tar.gz) or clone a git reository
 
 ```bash
-git clone https://github.com/pasoev/guile-words.git
+git clone https://github.com/pasoevi/guile-words.git
 
 ```
 
@@ -93,7 +93,7 @@ library immediately becomes available to the C application.
 ```
 
 * Define a high level function that calls the existing backend service
-and pass the newly defined action to it: 
+and pass the newly defined action to it:
 
 ```scheme
 
@@ -114,16 +114,16 @@ depend quality vantage well thoroughly soundly
 
 ## Contributing
 
-The [git repository](https://github.com/pasoev/guile-words.git)
+The [git repository](https://github.com/pasoevi/guile-words.git)
 contains the
-[TODO.md](https://github.com/pasoev/guile-words/blob/master/TODO.md)
-file. Look at [issues](https://github.com/pasoev/guile-words/issues)
+[TODO.md](https://github.com/pasoevi/guile-words/blob/master/TODO.md)
+file. Look at [issues](https://github.com/pasoevi/guile-words/issues)
 page on github as well.
 
 ## Copying
 
 Please, see the
-[LICENSE](https://github.com/pasoev/guile-words/blob/master/LICENSE)
+[LICENSE](https://github.com/pasoevi/guile-words/blob/master/LICENSE)
 file.
 
 This library is free software; you can redistribute it and/or
